@@ -4,7 +4,7 @@
 use core::arch::asm;
 
 #[macro_use]
-
+mod print;
 
 
 #[inline(always)]
@@ -38,6 +38,8 @@ unsafe extern "C" {
 
 fn main() -> ! {
     unsafe {set_bss_to_zero();}
+
+    println!("Hello word!");
 
     do_nothing();
 }
