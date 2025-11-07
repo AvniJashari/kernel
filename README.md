@@ -7,4 +7,4 @@ rust, con scaricato anche riscv64gc-unknown-none-elf
 QEMU, con la virtualizazione per architeture RISC V 64bit
 
 ## TODO
-non usare piu' il file run.sh, ma usare le funzionalità di Cargo
+implementare il trap e heap
