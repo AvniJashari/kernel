@@ -6,6 +6,7 @@ use core::arch::asm;
 #[macro_use]
 mod print;
 
+mod trap;
 
 #[inline(always)]
 fn do_nothing() -> ! {
@@ -15,7 +16,6 @@ fn do_nothing() -> ! {
         }
     }
 }
-
 
 #[unsafe(no_mangle)]
 #[unsafe(link_section = ".text.boot")]
@@ -40,14 +40,19 @@ fn main() -> ! {
     unsafe {set_bss_to_zero();}
 
     println!("Hello word!");
+    print!("hi");
 
+    unsafe{
+        asm!("csrw stvec, {}", in(reg) trap::trap_handler as usize);
+        asm!("unimp"); // Illegal instruction here!
+    }
     do_nothing();
 }
 
 unsafe fn set_bss_to_zero() -> (){
     let bss_start = &raw mut __bss;
     let bss_size = (&raw mut __bss_end as usize) - (&raw mut __bss as usize);
-    core::ptr::write_bytes(bss_start, 0, bss_size);
+    unsafe {core::ptr::write_bytes(bss_start, 0, bss_size);}
 }
 
 
@@ -55,9 +60,8 @@ use core::panic::PanicInfo;
 
 #[panic_handler]
 pub fn panic_handler(info: &PanicInfo) -> ! {
-    loop {
-        unsafe {
-            core::arch::asm!("wfi"); // Wait for an interrupt (idle loop)
-        }
-    }
+
+    println!("Panic: {}", info);
+
+    do_nothing();
 }
