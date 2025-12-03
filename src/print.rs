@@ -1,27 +1,17 @@
-use core::arch::asm;
+use crate::sbi;
+use crate::uart;
 
-
-
-pub fn sbi_putchar(ch:u8) -> (){
-    unsafe{
-        asm!{
-            "ecall",
-            in("a6") 0,
-            in("a7") 1,
-            inout("a0") ch as usize => _,
-            out("a1") _
-        }
-    }
+pub fn putc(c: u8) -> (){
+    sbi::putc(c);
+    //uart::Uart::putc(c);
 }
 
-
 pub struct Printer;
-
 
 impl core::fmt::Write for Printer{
     fn write_str(&mut self, s: &str) -> core::fmt::Result{
         for byte in s.bytes() {
-            sbi_putchar(byte);
+            putc(byte);
         }
 
         Ok(())
